@@ -1,98 +1,186 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# OpenSound API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend REST API for the OpenSound mobile application. Built with Node.js, Express, TypeScript and MongoDB. The API provides authentication, playlist management, JWT-based session handling and Swagger documentation.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Features
 
-## Description
+- Express.js + TypeScript with strict linting and formatting rules (ESLint + Prettier).
+- MongoDB integration via Mongoose with resilient connection handling.
+- User authentication with bcrypt password hashing and short-lived access tokens + long-lived refresh tokens.
+- Refresh token persistence for revocation and session management.
+- Playlist CRUD operations with per-track management, ordering and public/private visibility controls.
+- Input validation with Zod DTOs.
+- Global error handling, security middleware (Helmet, CORS, Mongo sanitization) and request logging.
+- Swagger documentation exposed at `/docs`.
+- Jest unit tests using `mongodb-memory-server` for isolated in-memory testing.
+- Husky pre-commit hook enforcing linting and tests.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Getting started
 
-## Project setup
+### Prerequisites
+
+- Node.js 18.18+
+- npm 9+
+- A MongoDB Atlas cluster with an `opensound` database.
+
+### Installation
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+### Environment variables
+
+Create a `.env` file based on the provided `.env.example`:
+
+```env
+PORT=3000
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-url>/opensound?retryWrites=true&w=majority
+JWT_SECRET=change-me
+JWT_REFRESH_SECRET=change-me-too
+ACCESS_TOKEN_TTL=15m
+REFRESH_TOKEN_TTL=7d
+CORS_ORIGINS=https://opensound.icu,exp://127.0.0.1:19000
+```
+
+- `ACCESS_TOKEN_TTL` and `REFRESH_TOKEN_TTL` accept [zeit/ms](https://github.com/vercel/ms) syntax such as `15m`, `1h`, `7d`.
+- `CORS_ORIGINS` is a comma-separated list of allowed origins in addition to the defaults (`https://opensound.icu`, Expo dev URLs).
+
+### Development workflow
+
+Run the API in watch mode using `nodemon` + `ts-node`:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm run dev
 ```
 
-## Run tests
+Build the production bundle:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run build
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Start the compiled server:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm start
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Quality gates
 
-## Resources
+```bash
+npm run lint    # ESLint static analysis
+npm run lint:fix
+npm run format  # Prettier formatting
+npm test        # Jest unit tests
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Husky automatically runs `npm run lint` and `npm test` before every commit.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### API documentation
 
-## Support
+Swagger UI is available at [`/docs`](http://localhost:3000/docs) once the server is running. The OpenAPI schema is generated from route annotations.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Project structure
 
-## Stay in touch
+```
+src/
+  app.ts                # Express app factory
+  server.ts             # HTTP bootstrapper
+  config/               # Environment, logger, CORS, Swagger
+  database/             # Mongoose connection + models
+  middleware/           # Auth, validation, error handling, logging
+  modules/
+    auth/               # Auth controllers, DTOs, services, routes
+    playlists/          # Playlist controllers, DTOs, services, routes
+  routes/               # API route registration
+  utils/                # JWT, password hashing, response helpers
+  types/                # Type augmentation declarations
+```
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+Tests live under `tests/` and rely on `mongodb-memory-server` for fast in-memory integration testing.
+
+## Deployment guide
+
+### 1. Build the production bundle
+
+```bash
+npm run build
+```
+
+This outputs compiled JavaScript to `dist/`.
+
+### 2. Containerization (recommended)
+
+Create a Dockerfile similar to:
+
+```Dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --omit=dev
+COPY dist ./dist
+COPY .env.production ./.env
+CMD ["node", "dist/server.js"]
+```
+
+Build and push the image to ECR:
+
+```bash
+aws ecr create-repository --repository-name opensound-api
+aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <account>.dkr.ecr.<region>.amazonaws.com
+docker build -t opensound-api .
+docker tag opensound-api:latest <account>.dkr.ecr.<region>.amazonaws.com/opensound-api:latest
+docker push <account>.dkr.ecr.<region>.amazonaws.com/opensound-api:latest
+```
+
+> Replace `<region>` and `<account>` with your AWS account details.
+
+### 3a. Deploy with Elastic Beanstalk
+
+1. Create an Elastic Beanstalk application and environment (Node.js platform).
+2. Configure environment variables in the EB console (same as `.env`).
+3. Upload the production bundle (or Docker image if using a Docker platform).
+4. Enable rolling updates and health checks.
+
+### 3b. Deploy with Amazon ECS (Fargate)
+
+1. Create an ECS cluster using Fargate.
+2. Define a task definition referencing the pushed ECR image, exposing port `3000`.
+3. Configure environment variables in the task definition.
+4. Set up a service with an Application Load Balancer (ALB) pointing to port `3000`.
+5. Enable auto-scaling rules based on CPU/Memory.
+
+### 4. Domain configuration (`opensound.icu`)
+
+1. In Route 53 (or your DNS provider), create an `A` record pointing `opensound.icu` to the ALB or EB environment endpoint.
+2. If using HTTPS, provision an ACM certificate for `opensound.icu` and attach it to the ALB/EB environment.
+3. Update CORS origins to include the production domain if necessary.
+
+### Observability & monitoring
+
+- Logs: the API uses Pino for structured logging. Ship logs to CloudWatch or another aggregation tool in production.
+- Metrics: integrate AWS CloudWatch alarms on CPU, memory, and 5xx error rates.
+- Backups: enable automated backups on the MongoDB Atlas cluster.
+
+## Testing locally
+
+The Jest suite relies on `mongodb-memory-server` and runs without touching Atlas. Execute:
+
+```bash
+npm test
+```
+
+## Contribution & onboarding notes
+
+- DTO validation lives next to each module under `src/modules/**/dto`.
+- All responses are wrapped using the helper in `src/utils/response.ts` to maintain a consistent `{ success, data, message }` shape.
+- When adding new routes, remember to:
+  - Create a Zod schema for the request payload.
+  - Register the route under `/api/v1/<module>`.
+  - Update Swagger annotations if you add new modules/endpoints.
+- Long-lived refresh tokens are persisted in MongoDB. Revoke tokens by deleting documents from the `refreshtokens` collection when required (e.g., from an admin tool).
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Private – All rights reserved.
